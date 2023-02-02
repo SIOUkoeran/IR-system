@@ -1,6 +1,7 @@
 package org.example.term;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * document term class
@@ -36,5 +37,18 @@ public class Term implements Comparator<Term> {
     @Override
     public String toString() {
         return term + " " + frequency;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(term);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Term term = (Term) obj;
+        return Objects.equals(term.term, this.term);
     }
 }
