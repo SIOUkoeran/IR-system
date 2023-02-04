@@ -12,7 +12,6 @@ public class DocumentConfig {
     }
 
     public void setDocumentFieldList(List<DocumentField> documentFields) {
-        System.out.println(documentFields.size());
         documentFieldList.addAll(documentFields);
     }
 }

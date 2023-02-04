@@ -53,8 +53,13 @@ public class TSVReader implements Serializable, Reader{
 
         Document document;
         String data;
+        boolean isColumnLine = true;
         try {
             while ((data = br.readLine()) != null) {
+                if (isColumnLine){
+                    isColumnLine = false;
+                    continue;
+                }
                 String[] tokens = data.split(delimiter);
                 document = new Document();
                 document.setFieldByConfig(documentConfig);
@@ -67,7 +72,7 @@ public class TSVReader implements Serializable, Reader{
                  * and clear memory
                  */
                 if (collections.size() >= size) {
-                    segmentWriter.writeSegment(collections);
+                    segmentWriter.writeSegment(collections, documentConfig);
                     collections.clear();
                     array.clear();
                 }
@@ -80,6 +85,11 @@ public class TSVReader implements Serializable, Reader{
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+        if (collections.size() > 0){
+            segmentWriter.writeSegment(collections, documentConfig);
+            collections.clear();
+            array.clear();
         }
         return array;
     }

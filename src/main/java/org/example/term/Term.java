@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * document term class
  */
-public class Term implements Comparator<Term> {
+public class Term implements Comparable<Term> {
 
     private String term;
 
@@ -19,8 +19,14 @@ public class Term implements Comparator<Term> {
         this.term = term;
     }
 
-    public void increaseFrequency() {
+    public Term increaseFrequency() {
         ++this.frequency;
+        return this;
+    }
+
+    public Term setTermFreq(int freq) {
+        this.frequency = freq;
+        return this;
     }
     /**
      * term frequency increase method
@@ -30,13 +36,13 @@ public class Term implements Comparator<Term> {
     }
 
     @Override
-    public int compare(Term o1, Term o2) {
-        return o1.term.compareTo(o2.term);
+    public int compareTo(Term o) {
+        return this.term.compareTo(o.term);
     }
 
     @Override
     public String toString() {
-        return term + " " + frequency;
+        return term + " " + frequency + " ";
     }
 
     @Override

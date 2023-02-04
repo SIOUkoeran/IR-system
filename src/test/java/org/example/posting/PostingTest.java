@@ -16,5 +16,4 @@ class PostingTest {
         System.out.println(posting.toString());
         Assertions.assertEquals(posting.toString(), "1 1 2 3 ");
     }
-
 }

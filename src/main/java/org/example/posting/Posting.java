@@ -1,10 +1,9 @@
 package org.example.posting;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import org.example.term.Term;
+
+import java.util.*;
 
 public class Posting implements Comparator<Posting> {
 
@@ -21,8 +20,9 @@ public class Posting implements Comparator<Posting> {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             for (Integer position : this) {
-                sb.append(position).append(" ");
+                sb.append(position).append(",");
             }
+            sb.setLength(sb.length() - 1);
             return sb.toString();
         }
     };
@@ -47,6 +47,10 @@ public class Posting implements Comparator<Posting> {
         positions.add(position);
     }
 
+    public int getPositionsLength() {
+        return positions.size();
+    }
+
     @Override
     public int compare(Posting o1, Posting o2) {
         return o1.docId - o2.docId;
@@ -54,6 +58,20 @@ public class Posting implements Comparator<Posting> {
 
     @Override
     public String toString() {
-        return docId + " " + positions.toString();
+        return docId + " [" + positions.toString() + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(docId);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Posting posting = (Posting) obj;
+        return Objects.equals(posting.docId, this.docId);
+
     }
 }

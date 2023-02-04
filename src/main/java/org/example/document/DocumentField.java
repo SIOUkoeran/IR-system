@@ -1,5 +1,7 @@
 package org.example.document;
 
+import java.util.Objects;
+
 public class DocumentField {
 
     private final String fieldName;
@@ -15,5 +17,15 @@ public class DocumentField {
     }
     public String getFieldType() {
         return fieldType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(fieldName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }

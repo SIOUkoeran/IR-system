@@ -1,11 +1,11 @@
 package org.example.document;
 
+import com.google.common.collect.Streams;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.google.common.collect.Streams.forEachPair;
 
 public class Document {
 
@@ -39,8 +39,8 @@ public class Document {
      */
     @SuppressWarnings("Beta")
     public void setToken(String[] tokens) {
-        System.out.println(Arrays.toString(tokens));
-        forEachPair(fieldConfig.stream(), Arrays.stream(tokens), fieldsMap::put);
+        fieldsMap.put(fieldConfig.get(0), tokens[0]);
+        Streams.forEachPair(fieldConfig.stream(), Arrays.stream(tokens), fieldsMap::put);
     }
 
     public HashMap<DocumentField, String> getFieldsMap() {
@@ -49,6 +49,11 @@ public class Document {
 
     public int getDocumentId() {
         return documentId;
+    }
+
+    @Override
+    public String toString() {
+        return fieldsMap.toString();
     }
 
 }
