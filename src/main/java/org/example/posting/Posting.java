@@ -1,9 +1,10 @@
 package org.example.posting;
 
 
-import org.example.term.Term;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 public class Posting implements Comparator<Posting> {
 

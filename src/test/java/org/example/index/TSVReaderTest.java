@@ -4,6 +4,7 @@ import org.example.document.Document;
 import org.example.document.DocumentConfig;
 import org.example.document.DocumentField;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -18,7 +19,8 @@ class TSVReaderTest {
             new DocumentConfig(),
             "\t",
             new SegmentWriter(
-                    "./"
+                    "./",
+                    new TokenNormalizer()
             )
     );
     private final String path = "src/main/resources/title.basics.tsv";
@@ -108,5 +110,14 @@ class TSVReaderTest {
                 .forEach(collection ->
                         System.out.println(collection.getFieldsMap())
                 );
+    }
+
+    @Test
+    @DisplayName("TSVReader 클래스 안에 있는 bufferedReader 소요시간 테스트")
+    void brTestInTSVReader() {
+        long startTime = System.currentTimeMillis();
+
+        long endTime = System.currentTimeMillis();
+
     }
 }

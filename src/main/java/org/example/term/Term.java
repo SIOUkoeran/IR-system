@@ -1,6 +1,5 @@
 package org.example.term;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 /**

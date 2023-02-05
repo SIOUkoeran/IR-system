@@ -48,8 +48,8 @@ public class TSVReader implements Serializable, Reader{
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        List<String> array = new ArrayList<String>(size);
-        List<Document> collections = new ArrayList<>(size);
+        List<String> array = new ArrayList<String>(size * 2);
+        List<Document> collections = new ArrayList<>(size * 2);
 
         Document document;
         String data;
@@ -72,6 +72,7 @@ public class TSVReader implements Serializable, Reader{
                  * and clear memory
                  */
                 if (collections.size() >= size) {
+                    System.out.println("read done");
                     segmentWriter.writeSegment(collections, documentConfig);
                     collections.clear();
                     array.clear();
@@ -87,6 +88,7 @@ public class TSVReader implements Serializable, Reader{
             }
         }
         if (collections.size() > 0){
+            System.out.println("read done");
             segmentWriter.writeSegment(collections, documentConfig);
             collections.clear();
             array.clear();

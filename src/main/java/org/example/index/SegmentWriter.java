@@ -21,9 +21,12 @@ public class SegmentWriter {
     private final String outputPath;
 
     private Set<String> blockFiles = new HashSet<>();
+
+    private final TokenNormalizer tokenNormalizer;
     private int segmentCount = 0;
-    public SegmentWriter(String outputPath) {
+    public SegmentWriter(String outputPath, TokenNormalizer tokenNormalizer) {
         this.outputPath = outputPath;
+        this.tokenNormalizer = tokenNormalizer;
     }
 
     /**
@@ -64,6 +67,7 @@ public class SegmentWriter {
             bw.flush();
             bw.close();
         }catch (Exception e){
+            e.printStackTrace();
             throw new RuntimeException();
         }
     }
@@ -92,7 +96,6 @@ public class SegmentWriter {
             HashMap<DocumentField, String> fieldsMap = document.getFieldsMap();
             int idx = 0;
             for (DocumentField documentField : documentFields) {
-                System.out.println(fieldsMap.get(documentField));
                 makeZoneInvertedIndex(
                         documentField,
                         document,
@@ -100,6 +103,7 @@ public class SegmentWriter {
                         zoneIndexes[idx++]
                         );
             }
+            //TODO (document 색인기 구현)
         }
         return zoneIndexes;
     }
@@ -116,9 +120,11 @@ public class SegmentWriter {
                                                                Document document,
                                                                String fieldValue,
                                                                TreeMap<Term, ArrayList<Posting>> zoneIndex) {
-        String[] splitFieldValue = fieldValue.split(" ");
+        String[] splitFieldValue = fieldValue.split("[ ,]");
         AtomicInteger index = new AtomicInteger(0);
         Arrays.stream(splitFieldValue)
+                .map(this::makeNormalize)
+                .filter(StopWordFilter::filter)
                 .forEach(splitValue -> {
                     Term term = new Term(splitValue);
                     if (!zoneIndex.containsKey(term)) {
@@ -172,5 +178,11 @@ public class SegmentWriter {
             cnt += posting.getPositionsLength();
         }
         return cnt;
+    }
+
+    private String makeNormalize(String token) {
+        return tokenNormalizer
+                .makeToLowerCase(token)
+                .replaceRegex();
     }
 }
