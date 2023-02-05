@@ -8,7 +8,6 @@ public class IndexWriter {
      */
     private final Reader reader;
 
-
     /**
      * file 이 존재하는 경로
      */

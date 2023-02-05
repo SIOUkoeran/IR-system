@@ -1,6 +1,8 @@
 package org.example.posting;
 
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +32,11 @@ public class Posting implements Comparator<Posting> {
 
     public Posting(int docId) {
         this.docId = docId;
+    }
+
+    public Posting(int docId, ArrayList<Integer> positions) {
+        this.docId = docId;
+        this.positions.addAll(positions);
     }
 
     public Posting(int docId, int idx) {

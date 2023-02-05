@@ -34,7 +34,8 @@ public class TSVReader implements Serializable, Reader{
     }
 
     /**
-     * read tsv method per size 10000
+     * 데이터를 size 인수만큼 끊어서 읽은 뒤, 디스크에 block 을 생성한다.
+     * 지정한 데이터를 끝까지 다 읽은 뒤, 해당 block 들을 병합한다.
      * @param path data input file path
      * @param size memory buffer size
      */
@@ -93,6 +94,7 @@ public class TSVReader implements Serializable, Reader{
             collections.clear();
             array.clear();
         }
+        segmentWriter.mergeBlocks();
         return array;
     }
 

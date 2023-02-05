@@ -15,7 +15,9 @@ public class StopWordFilter {
                     "the",
                     "\\n",
                     "and",
-                    "or"
+                    "or",
+                    " ",
+                    ""
             )
     );
 

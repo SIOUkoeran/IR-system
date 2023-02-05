@@ -156,4 +156,33 @@ class SegmentWriterTest {
 
         String[] lineArray = titleBr.readLine().split(" ");
     }
+
+    @Test
+    @DisplayName("임의의 2개 파일 병합 테스트")
+    void mergeTwoFilesTest() throws IOException {
+        //when
+        TokenNormalizer tokenNormalizer = new TokenNormalizer();
+        String outputPath = "src/main/resources/segmentMerge/";
+        SegmentWriter segmentWriter = new SegmentWriter(
+                outputPath,
+                tokenNormalizer
+        );
+        BufferedReader br1 = new BufferedReader(new FileReader(outputPath + "primaryTitle0"));
+        BufferedReader br2 = new BufferedReader(new FileReader(outputPath + "primaryTitle1"));
+        List<BufferedReader> brList = new ArrayList<>();
+        brList.add(br1);
+        brList.add(br2);
+
+        List<String> lines = new ArrayList<>();
+        lines.add(br1.readLine());
+        lines.add(br2.readLine());
+
+        //given
+        segmentWriter.writeBlocks(brList, lines, "primaryTitle");
+
+        //then
+        BufferedReader br = new BufferedReader(new FileReader(outputPath + "primaryTitle"));
+        Assertions.assertEquals(br.readLine(), "");
+        Assertions.assertArrayEquals(br.readLine().split(" "), "1895 20 [1]  201 [1] ".split(" "));
+    }
 }

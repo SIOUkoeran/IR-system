@@ -1,17 +1,22 @@
 package org.example.index;
 
+import com.google.common.collect.*;
 import org.example.document.Document;
 import org.example.document.DocumentConfig;
 import org.example.document.DocumentField;
 import org.example.posting.Posting;
 import org.example.term.Term;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.nio.channels.FileChannel;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * segment writer
@@ -20,10 +25,11 @@ public class SegmentWriter {
 
     private final String outputPath;
 
-    private Set<String> blockFiles = new HashSet<>();
+    private final Multimap<String, String> blockFile = ArrayListMultimap.create();
+    private final Set<String> blockFiles = new HashSet<>();
 
     private final TokenNormalizer tokenNormalizer;
-    private int segmentCount = 0;
+    private static int segmentCount = 0;
     public SegmentWriter(String outputPath, TokenNormalizer tokenNormalizer) {
         this.outputPath = outputPath;
         this.tokenNormalizer = tokenNormalizer;
@@ -42,8 +48,110 @@ public class SegmentWriter {
                     zoneIndexes[i]
             );
             blockFiles.add(documentFieldList.get(i).getFieldName() + segmentCount);
+            blockFile.put(documentFieldList.get(i).getFieldName(), String.valueOf(segmentCount));
         }
         ++segmentCount;
+    }
+
+    /**
+     * 분할 저장했던 block 들을 병합하여 하나의 파일로 새로 생성하는 메소드
+     */
+    public void mergeBlocks() {
+        Map<String, List<BufferedReader>> bufferedReaders = openBlocksReturnMap();
+        for (Map.Entry<String, List<BufferedReader>> brEntry : bufferedReaders.entrySet()) {
+            List<BufferedReader> brList = brEntry.getValue();
+            List<String> lines = new ArrayList<>();
+            brList.removeIf(br -> {
+                try {
+                    String line = br.readLine();
+                    if (line != null && !line.equals(""))
+                        lines.add(line);
+                    return line == null || line.equals("");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            writeBlocks(brList, lines, brEntry.getKey());
+        }
+    }
+
+    public void writeBlocks(List<BufferedReader> brList, List<String> lines, String filePrefix) {
+        StringBuilder recentTerm = new StringBuilder(" ");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath + filePrefix))) {
+            while (lines.size() > 0 && brList.size() > 0) {
+                int min = lines.indexOf(Collections.min(lines));
+                String line = lines.get(min);
+                String curTerm = line.split(" ")[0];
+                List<Posting> postingList = getPosting(line);
+                if (!curTerm.equals(recentTerm.toString())) {
+                    bw.write("\n" + curTerm + " " + postingList);
+                    recentTerm.setLength(0);
+                    recentTerm.append(curTerm);
+                } else {
+                    bw.write(" " + postingList);
+                }
+
+                lines.set(min, brList.get(min).readLine());
+                if (lines.get(min) == null || lines.get(min).equals("")){
+                    brList.get(min).close();
+                    brList.remove(min);
+                    lines.remove(min);
+                }
+            }
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        };
+
+    }
+
+    private List<Posting> getPosting(String line) {
+        String[] lineArray = line.split(" ");
+        List<Posting> postingList = new ArrayList<>(){
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder();
+                for (Posting posting : this) {
+                    sb.append(posting.toString()).append(" ");
+                }
+                return sb.toString();
+            }
+        };
+        if (lineArray.length < 3)
+            return new ArrayList<>();
+        for (int i = 2; i < lineArray.length - 1; i+=2) {
+            int docId = Integer.parseInt(lineArray[i]);
+            ArrayList<Integer> positions = getPositions(lineArray[i + 1]);
+            postingList.add(new Posting(docId, positions));
+        }
+        System.out.println(postingList.toString());
+        return postingList;
+    }
+
+    private ArrayList<Integer> getPositions(String positions) {
+        return (ArrayList<Integer>) Arrays.stream(positions.substring(1, positions.length() - 1).split(","))
+                .mapToInt(Integer::parseInt)
+                 .boxed()
+                 .collect(Collectors.toList());
+    }
+
+    private Map<String,List<BufferedReader>> openBlocksReturnMap() {
+        return blockFile.asMap().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().stream()
+                                .map(value -> {
+                                    try{
+                                        return new BufferedReader(new FileReader(outputPath + e.getKey() + value));
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                        return null;
+                                    }
+                                })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList())
+                ));
     }
 
     /**
@@ -184,5 +292,9 @@ public class SegmentWriter {
         return tokenNormalizer
                 .makeToLowerCase(token)
                 .replaceRegex();
+    }
+
+    public Set<String> getBlocks() {
+        return blockFiles;
     }
 }
