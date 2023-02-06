@@ -38,3 +38,5 @@ out/
 
 ### data file ###
 src/main/resources/
+!src/main/resources/segmentMerge/
+!src/main/resources/segmentWriterTest/30000
