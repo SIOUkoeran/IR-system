@@ -1,4 +1,4 @@
-package org.example.index;
+package org.example.document;
 
 import org.example.document.Document;
 import org.example.document.DocumentConfig;

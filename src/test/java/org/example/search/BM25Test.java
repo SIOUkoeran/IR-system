@@ -3,15 +3,12 @@ package org.example.search;
 import org.example.document.Document;
 import org.example.document.DocumentConfig;
 import org.example.document.DocumentField;
-import org.example.index.DocumentReader;
+import org.example.document.DocumentReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.text.Style;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class BM25Test {
 

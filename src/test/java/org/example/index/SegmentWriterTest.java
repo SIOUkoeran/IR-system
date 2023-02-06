@@ -3,6 +3,7 @@ package org.example.index;
 import org.example.document.DocumentConfig;
 import org.example.document.DocumentField;
 import org.example.document.DocumentIdGenerator;
+import org.example.document.DocumentWriter;
 import org.example.posting.Posting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

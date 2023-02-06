@@ -3,6 +3,7 @@ package org.example.index;
 
 import org.example.document.Document;
 import org.example.document.DocumentConfig;
+import org.example.document.DocumentWriter;
 
 import java.io.*;
 import java.util.ArrayList;

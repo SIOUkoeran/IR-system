@@ -3,7 +3,7 @@ package org.example.index;
 import org.example.document.Document;
 import org.example.document.DocumentConfig;
 import org.example.document.DocumentField;
-import org.junit.jupiter.api.Assertions;
+import org.example.document.DocumentWriter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
