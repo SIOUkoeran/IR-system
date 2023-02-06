@@ -77,6 +77,7 @@ public class SegmentWriter {
 
     public void writeBlocks(List<BufferedReader> brList, List<String> lines, String filePrefix) {
         StringBuilder recentTerm = new StringBuilder(" ");
+        int size = 0;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath + filePrefix))) {
             while (lines.size() > 0 && brList.size() > 0) {
                 int min = lines.indexOf(Collections.min(lines));
@@ -87,6 +88,7 @@ public class SegmentWriter {
                     bw.write("\n" + curTerm + " " + postingList);
                     recentTerm.setLength(0);
                     recentTerm.append(curTerm);
+                    ++size;
                 } else {
                     bw.write(" " + postingList);
                 }
@@ -98,6 +100,7 @@ public class SegmentWriter {
                     lines.remove(min);
                 }
             }
+            bw.write("\n" + size);
             bw.flush();
             bw.close();
         } catch (IOException e) {
