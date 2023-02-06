@@ -7,5 +7,5 @@ import java.util.List;
  */
 public interface Reader {
 
-    List<String> read(String path, int size);
+    void read(String path, int size);
 }

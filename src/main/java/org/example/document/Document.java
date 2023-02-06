@@ -9,16 +9,20 @@ import java.util.List;
 
 public class Document {
 
-    private final int documentId = DocumentIdGenerator.generateIdSeq();
-    private List<DocumentField> fields = new ArrayList<DocumentField>();
+    private int documentId = DocumentIdGenerator.generateIdSeq();
 
     private List<DocumentField> fieldConfig = new ArrayList<>();
     private HashMap<DocumentField, String> fieldsMap = new HashMap<>();
     public Document(){}
 
-
-    public void setField(String fieldName, String fieldType) {
-        fields.add(new DocumentField(fieldName, fieldType));
+    public Document(String line, DocumentConfig documentConfig) {
+        String[] strings = line.split("\t");
+        this.documentId = Integer.parseInt(strings[0]);
+        System.out.println(Arrays.toString(strings));
+        fieldConfig.addAll(documentConfig.getDocumentFieldList());
+        for (int idx = 0; idx < fieldConfig.size(); idx++) {
+            fieldsMap.put(fieldConfig.get(idx), strings[idx + 1]);
+        }
     }
 
     public void setFieldByConfig(DocumentConfig documentConfig){
@@ -51,9 +55,15 @@ public class Document {
         return documentId;
     }
 
+    public String writeDocument() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(documentId).append("\t");
+        fieldsMap.values()
+                .forEach(s -> sb.append(s).append("\t"));
+        return sb.toString();
+    }
     @Override
     public String toString() {
         return fieldsMap.toString();
     }
-
 }

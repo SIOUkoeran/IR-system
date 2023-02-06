@@ -21,15 +21,14 @@ class TSVReaderTest {
             new SegmentWriter(
                     "./",
                     new TokenNormalizer()
-            )
+            ),
+            new DocumentWriter("./")
     );
     private final String path = "src/main/resources/title.basics.tsv";
     @Test
     void testTsvReadTest() throws IOException {
-        List<String> inputData = reader.read(path, 10);
-        inputData
-                .forEach(System.out::println);
-        Assertions.assertEquals(inputData.size(), 10);
+        reader.read(path, 10);
+
     }
 
     @Test

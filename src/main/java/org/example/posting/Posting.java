@@ -59,6 +59,14 @@ public class Posting implements Comparator<Posting> {
         return positions.size();
     }
 
+    public List<Integer> getPositions() {
+        return positions;
+    }
+
+    public int getDocId() {
+        return docId;
+    }
+
     @Override
     public int compare(Posting o1, Posting o2) {
         return o1.docId - o2.docId;

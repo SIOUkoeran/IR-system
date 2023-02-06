@@ -27,10 +27,16 @@ public class TSVReader implements Serializable, Reader{
      */
     private final SegmentWriter segmentWriter;
 
-    public TSVReader(DocumentConfig documentConfig, String delimiter, SegmentWriter segmentWriter) {
+    private final DocumentWriter documentWriter;
+
+    public TSVReader(DocumentConfig documentConfig,
+                     String delimiter,
+                     SegmentWriter segmentWriter,
+                     DocumentWriter documentWriter) {
         this.documentConfig = documentConfig;
         this.delimiter = delimiter;
         this.segmentWriter = segmentWriter;
+        this.documentWriter = documentWriter;
     }
 
     /**
@@ -39,17 +45,17 @@ public class TSVReader implements Serializable, Reader{
      * @param path data input file path
      * @param size memory buffer size
      */
-    public List<String> read(String path, int size){
+    public void read(String path, int size){
         if (size == 0){
             size = Integer.MAX_VALUE;
         }
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(path));
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
-        List<String> array = new ArrayList<String>(size * 2);
         List<Document> collections = new ArrayList<>(size * 2);
 
         Document document;
@@ -66,7 +72,6 @@ public class TSVReader implements Serializable, Reader{
                 document.setFieldByConfig(documentConfig);
                 document.setToken(tokens);
                 collections.add(document);
-                array.add(data);
                 /**
                  * if collection size is upper user defined size,
                  * segmentWriter write segment.
@@ -75,8 +80,8 @@ public class TSVReader implements Serializable, Reader{
                 if (collections.size() >= size) {
                     System.out.println("read done");
                     segmentWriter.writeSegment(collections, documentConfig);
+                    documentWriter.writeDocuments(collections);
                     collections.clear();
-                    array.clear();
                 }
             }
         }catch (IOException e) {
@@ -92,10 +97,8 @@ public class TSVReader implements Serializable, Reader{
             System.out.println("read done");
             segmentWriter.writeSegment(collections, documentConfig);
             collections.clear();
-            array.clear();
         }
         segmentWriter.mergeBlocks();
-        return array;
     }
 
     public void addField(String fieldName) {

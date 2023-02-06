@@ -77,8 +77,9 @@ public class SegmentWriter {
 
     public void writeBlocks(List<BufferedReader> brList, List<String> lines, String filePrefix) {
         StringBuilder recentTerm = new StringBuilder(" ");
+        makeIndexDir();
         int size = 0;
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath + filePrefix))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath + "/index/" + filePrefix))) {
             while (lines.size() > 0 && brList.size() > 0) {
                 int min = lines.indexOf(Collections.min(lines));
                 String line = lines.get(min);
@@ -90,7 +91,7 @@ public class SegmentWriter {
                     recentTerm.append(curTerm);
                     ++size;
                 } else {
-                    bw.write(" " + postingList);
+                    bw.write(postingList.toString());
                 }
 
                 lines.set(min, brList.get(min).readLine());
@@ -107,6 +108,18 @@ public class SegmentWriter {
             throw new RuntimeException(e);
         };
 
+    }
+
+    private void makeIndexDir() {
+        File dir = new File(outputPath + "/index");
+        if (!dir.exists()) {
+            try{
+                dir.mkdir();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private List<Posting> getPosting(String line) {
@@ -128,7 +141,6 @@ public class SegmentWriter {
             ArrayList<Integer> positions = getPositions(lineArray[i + 1]);
             postingList.add(new Posting(docId, positions));
         }
-        System.out.println(postingList.toString());
         return postingList;
     }
 

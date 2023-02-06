@@ -44,7 +44,8 @@ class SegmentWriterTest {
         TSVReader tsvReader = new TSVReader(
                 documentConfig,
                 "\t",
-                new SegmentWriter(outputPath, new TokenNormalizer())
+                new SegmentWriter(outputPath, new TokenNormalizer()),
+                new DocumentWriter(outputPath + "/index")
         );
         tsvReader.read(inputPath, 3);
 
@@ -111,7 +112,8 @@ class SegmentWriterTest {
         TSVReader tsvReader = new TSVReader(
                 documentConfig,
                 "\t",
-                new SegmentWriter(outputPath, new TokenNormalizer())
+                new SegmentWriter(outputPath, new TokenNormalizer()),
+                new DocumentWriter(outputPath)
         );
         tsvReader.read(inputPath, 1000);
 
@@ -145,7 +147,8 @@ class SegmentWriterTest {
         TSVReader tsvReader = new TSVReader(
                 documentConfig,
                 "\t",
-                new SegmentWriter(outputPath, new TokenNormalizer())
+                new SegmentWriter(outputPath, new TokenNormalizer()),
+                new DocumentWriter(outputPath)
         );
         long startTime = System.currentTimeMillis();
         tsvReader.read(inputPath, number);
@@ -181,8 +184,40 @@ class SegmentWriterTest {
         segmentWriter.writeBlocks(brList, lines, "primaryTitle");
 
         //then
-        BufferedReader br = new BufferedReader(new FileReader(outputPath + "primaryTitle"));
+        BufferedReader br = new BufferedReader(new FileReader(outputPath + "/index/primaryTitle"));
         Assertions.assertEquals(br.readLine(), "");
-        Assertions.assertArrayEquals(br.readLine().split(" "), "1895 20 [1]  201 [1] ".split(" "));
+        Assertions.assertArrayEquals(br.readLine().split(" "), "1895 20 [1] 201 [1] ".split(" "));
+    }
+
+    @Test
+    @DisplayName("전체 데이터 역색인 테스트")
+    void testTotalData() {
+        String outputPath = "src/main/resources/fullSize/";
+        String inputPath = "src/main/resources/title.basics.tsv";
+
+        DocumentConfig documentConfig = new DocumentConfig();
+        List<DocumentField> documentFieldList = new ArrayList<>();
+
+        documentFieldList.add(new DocumentField("tconst", "text"));
+        documentFieldList.add(new DocumentField("titleType", "text"));
+        documentFieldList.add(new DocumentField("primaryTitle", "text"));
+        documentFieldList.add(new DocumentField("originalTitle", "text"));
+        documentFieldList.add(new DocumentField("isAdult", "text"));
+        documentFieldList.add(new DocumentField("startYear", "text"));
+        documentFieldList.add(new DocumentField("endYear", "text"));
+        documentFieldList.add(new DocumentField("runtimeMinutes", "text"));
+        documentFieldList.add(new DocumentField("genres", "text"));
+        documentConfig.setDocumentFieldList(documentFieldList);
+
+        TSVReader tsvReader = new TSVReader(
+                documentConfig,
+                "\t",
+                new SegmentWriter(outputPath, new TokenNormalizer()),
+                new DocumentWriter(outputPath)
+        );
+        long startTime = System.currentTimeMillis();
+        tsvReader.read(inputPath, 20000);
+        long endTime = System.currentTimeMillis();
+        System.out.println(endTime - startTime);
     }
 }

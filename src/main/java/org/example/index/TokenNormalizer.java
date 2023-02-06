@@ -13,7 +13,9 @@ public class TokenNormalizer {
 
     private final Set<String> regexSet = new HashSet<>(
             List.of(
-                    " "
+                    " ",
+                    "\\'",
+                    "[^0-9a-zA-z]"
             )
     );
     public TokenNormalizer(String ...token) {
