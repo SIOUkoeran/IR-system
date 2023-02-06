@@ -25,12 +25,12 @@ public class TokenNormalizer {
     public void addSet(String ... token) {
         regexSet.addAll(List.of(token));
     }
-    TokenNormalizer makeToLowerCase(String token) {
+    public TokenNormalizer makeToLowerCase(String token) {
         this.token = token.toLowerCase();
         return this;
     }
 
-    String replaceRegex() {
+    public String replaceRegex() {
         regexSet.forEach(regex -> {
             this.token = token.replaceAll(regex, "");
         });

@@ -1,5 +1,6 @@
 package org.example.search;
 
+import org.example.index.TokenNormalizer;
 import org.example.posting.Posting;
 
 import java.io.*;
@@ -10,6 +11,8 @@ public class BM25 implements Scorer{
 
     private final String path;
     private int limit = 50;
+
+    private final TokenNormalizer tokenNormalizer = new TokenNormalizer();
 
     public BM25(String path) {
         this.path = path;
@@ -53,7 +56,11 @@ public class BM25 implements Scorer{
                 .collect(Collectors.toList());
     }
     private String[] splitQuery(String query) {
-        return query.split(" ");
+        return Arrays.stream(query.split(" "))
+                .map(q -> tokenNormalizer
+                        .makeToLowerCase(q)
+                        .replaceRegex())
+                .toArray(String[]::new);
     }
 
     private File[] getFiles(String path) {
